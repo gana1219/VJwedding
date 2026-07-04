@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#4a0a1c" />
+  <title>Subash & Jamuna — Wedding Invitation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --maroon: #7a1230;
+      --maroon-deep: #4a0a1c;
+      --gold: #c9a227;
+      --gold-light: #f0d78c;
+      --cream: #fffaf2;
+      --cream-dark: #f5ebe0;
+      --safe-t: env(safe-area-inset-top, 0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --auto-ms: 2000;
+    }
+
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+
+    body {
+      min-height: 100dvh;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      color: var(--maroon-deep);
+      overflow: hidden;
+      background: var(--maroon-deep);
+    }
+
+    /* Layered maroon-gold background */
+    .scene {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(122,18,48,0.4) 0%, transparent 45%),
+        linear-gradient(175deg, var(--maroon-deep) 0%, var(--maroon) 40%, #5c0f28 100%);
+    }
+
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L35 25 L55 30 L35 35 L30 55 L25 35 L5 30 L25 25 Z' fill='none' stroke='%23c9a227' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    /* Petals */
+    .petals {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      top: -30px;
+      animation: petalDrift linear infinite;
+    }
+
+    .petal.j { width: 11px; height: 11px; background: #fff; border-radius: 50%; box-shadow: 4px 0 #fff, -4px 0 #fff; }
+    .petal.r { width: 12px; height: 12px; background: #d81b60; border-radius: 50% 0 50% 50%; transform: rotate(45deg); }
+
+    @keyframes petalDrift {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+      8%   { opacity: 0.85; }
+      100% { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+    }
+
+    .stage {
+      position: relative;
+      z-index: 10;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(0.6rem + var(--safe-t)) 1rem calc(0.5rem + var(--safe-b));
+    }
+
+    @media (max-width: 599px) {
+      .stage {
+        padding-top: calc(5.75rem + var(--safe-t));
+        padding-bottom: calc(6.25rem + var(--safe-b));
+        justify-content: center;
+      }
+    }
+
+    /* Card stack */
+    .stack-wrap {
+      position: relative;
+      width: min(100%, 400px);
+      height: min(68dvh, 520px);
+      perspective: 1200px;
+      flex-shrink: 0;
+    }
+
+    .stack-card {
+      position: absolute;
+      inset: 0;
+      background: var(--cream);
+      border-radius: 10px;
+      border: 2px solid var(--gold);
+      box-shadow:
+        0 16px 48px rgba(0,0,0,0.28),
+        0 0 0 6px var(--cream-dark),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+      padding: clamp(1rem, 4vw, 1.5rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transform-origin: center bottom;
+      transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.75s ease,
+                  filter 0.75s ease;
+      overflow: hidden;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .stack-card[data-pos="0"] { z-index: 5; transform: translateY(0) scale(1); }
+    .stack-card[data-pos="1"] { z-index: 4; transform: translateY(10px) scale(0.96); opacity: 0.92; filter: brightness(0.97); }
+    .stack-card[data-pos="2"] { z-index: 3; transform: translateY(20px) scale(0.92); opacity: 0.8; filter: brightness(0.94); }
+    .stack-card[data-pos="3"] { z-index: 2; transform: translateY(30px) scale(0.88); opacity: 0.65; }
+    .stack-card[data-pos="4"] { z-index: 1; transform: translateY(40px) scale(0.84); opacity: 0.5; }
+    .stack-card[data-pos="hidden"] { z-index: 0; transform: translateY(50px) scale(0.8); opacity: 0; pointer-events: none; }
+
+    .stack-card.exit-left {
+      transform: translateX(-115%) rotate(-12deg) scale(0.9) !important;
+      opacity: 0 !important;
+      transition: transform 0.7s cubic-bezier(0.55, 0, 0.85, 0.36), opacity 0.5s ease !important;
+    }
+
+    .stack-card.enter-back {
+      animation: cardEnter 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+    }
+
+    @keyframes cardEnter {
+      from { transform: translateY(60px) scale(0.75); opacity: 0; }
+      to   { transform: translateY(40px) scale(0.84); opacity: 0.5; }
+    }
+
+    /* Corner flourishes on each card */
+    .stack-card::before,
+    .stack-card::after {
+      content: "❦";
+      position: absolute;
+      color: var(--gold);
+      font-size: 1rem;
+      opacity: 0.45;
+    }
+
+    .stack-card::before { top: 10px; left: 12px; }
+    .stack-card::after  { bottom: 10px; right: 12px; transform: rotate(180deg); }
+
+    .card-label {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--maroon);
+      opacity: 0.5;
+    }
+
+    .card-om {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      color: var(--gold);
+      margin-bottom: 0.35rem;
+      animation: omShine 3s ease-in-out infinite;
+    }
+
+    @keyframes omShine {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(201,162,39,0.4)); }
+      50%       { filter: drop-shadow(0 0 14px rgba(201,162,39,0.8)); }
+    }
+
+    .card-title {
+      font-family: "Great Vibes", cursive;
+      font-size: clamp(1.8rem, 7vw, 2.6rem);
+      color: var(--maroon);
+      line-height: 1.15;
+    }
+
+    .card-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 0.35rem;
+    }
+
+    .card-body {
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-size: clamp(0.82rem, 3vw, 0.98rem);
+      color: #5c3040;
+      line-height: 1.55;
+      max-width: 300px;
+      margin-top: 0.5rem;
+    }
+
+    .card-body strong {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--maroon);
+      display: block;
+      font-size: 1.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .gold-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0.65rem auto;
+    }
+
+    /* Photos */
+    .duo-photos {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.4rem, 3vw, 0.85rem);
+      margin-bottom: 0.65rem;
+    }
+
+    .photo-ring {
+      width: clamp(78px, 24vw, 105px);
+      height: clamp(78px, 24vw, 105px);
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--maroon));
+      box-shadow: 0 6px 20px rgba(74,10,28,0.2);
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+
+    .photo-ring:nth-child(2) { animation-delay: 1.5s; }
+
+    @keyframes ringPulse {
+      0%, 100% { box-shadow: 0 6px 20px rgba(74,10,28,0.2); }
+      50%       { box-shadow: 0 6px 24px rgba(201,162,39,0.35); }
+    }
+
+    .photo-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--cream-dark);
+      display: block;
+    }
+
+    .photo-fallback {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--cream-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12%;
+    }
+
+    .photo-fallback img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .duo-heart-sticker {
+      width: clamp(28px, 8vw, 36px);
+      height: clamp(28px, 8vw, 36px);
+      flex-shrink: 0;
+    }
+
+    .duo-heart-sticker img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .duo-amp {
+      font-family: "Great Vibes", cursive;
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .name-script {
+      font-family: "Great Vibes", cursive;
+      font-size: clamp(1.15rem, 4.5vw, 1.45rem);
+      color: var(--maroon);
+      line-height: 1.2;
+    }
+
+    .name-alias {
+      font-size: 0.68rem;
+      font-style: italic;
+      color: #9b6070;
+    }
+
+    .map-btn {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.5rem 1.2rem;
+      border: 1.5px solid var(--gold);
+      border-radius: 24px;
+      color: var(--maroon);
+      text-decoration: none;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .map-btn:active { background: var(--maroon); color: var(--gold-light); }
+
+    /* Couple illustrations */
+    .hero-art {
+      width: min(100%, 240px);
+      height: auto;
+      max-height: 165px;
+      object-fit: contain;
+      object-position: center top;
+      border-radius: 8px;
+      border: 2px solid var(--gold);
+      margin-bottom: 0.55rem;
+      display: block;
+      box-shadow: 0 6px 18px rgba(74, 10, 28, 0.15);
+    }
+
+    .featured-art {
+      width: min(100%, 240px);
+      height: auto;
+      max-height: 165px;
+      object-fit: contain;
+      object-position: center top;
+      border-radius: 8px;
+      border: 2px solid var(--gold);
+      margin-bottom: 0.5rem;
+      display: block;
+      box-shadow: 0 6px 18px rgba(74, 10, 28, 0.15);
+    }
+
+    .couple-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      width: 100%;
+      max-width: 300px;
+      align-content: center;
+    }
+
+    .couple-gallery figure {
+      margin: 0;
+      border-radius: 8px;
+      border: 2px solid var(--gold);
+      overflow: hidden;
+      line-height: 0;
+      box-shadow: 0 4px 12px rgba(74, 10, 28, 0.1);
+    }
+
+    .couple-gallery img {
+      width: 100%;
+      height: auto;
+      max-height: 112px;
+      object-fit: contain;
+      object-position: center top;
+      display: block;
+    }
+
+    .stack-card.gallery-card {
+      justify-content: center;
+      gap: 0.65rem;
+    }
+
+    /* Timeline rail */
+    .timeline {
+      width: min(100%, 400px);
+      margin-top: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 11px;
+      left: 5%;
+      right: 5%;
+      height: 2px;
+      background: rgba(201,162,39,0.25);
+      z-index: 0;
+    }
+
+    .timeline-fill {
+      position: absolute;
+      top: 11px;
+      left: 5%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      z-index: 1;
+      width: 0%;
+      transition: width 0.3s ease;
+      max-width: 90%;
+    }
+
+    .t-node {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .t-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      background: var(--maroon-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.5rem;
+      color: var(--gold-light);
+      transition: background 0.35s, transform 0.35s, box-shadow 0.35s;
+    }
+
+    .t-node.active .t-dot {
+      background: var(--gold);
+      color: var(--maroon-deep);
+      transform: scale(1.2);
+      box-shadow: 0 0 14px rgba(201,162,39,0.5);
+    }
+
+    .t-node.done .t-dot {
+      background: var(--maroon);
+      border-color: var(--gold-light);
+      color: var(--gold-light);
+    }
+
+    .t-label {
+      font-size: 0.42rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      opacity: 0.55;
+      max-width: 44px;
+      line-height: 1.2;
+      transition: opacity 0.3s;
+    }
+
+    .t-node.active .t-label { opacity: 1; }
+
+    /* Controls */
+    .bar {
+      width: min(100%, 400px);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 4px;
+      background: rgba(201,162,39,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 4px;
+    }
+
+    .bar-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+      background: rgba(255,250,242,0.08);
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bar-btn:active { background: var(--gold); color: var(--maroon-deep); }
+
+    .tap-card {
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      opacity: 0.45;
+      margin-top: 0.5rem;
+    }
+
+    /* Couple sticker + countdown */
+    .side-sticker {
+      position: fixed;
+      z-index: 15;
+      pointer-events: none;
+      left: max(0.5rem, env(safe-area-inset-left, 0px));
+      top: 50%;
+      transform: translateY(-50%);
+      width: clamp(108px, 16vw, 138px);
+      animation: stickerFloat 5s ease-in-out infinite;
+    }
+
+    @keyframes stickerFloat {
+      0%, 100% { transform: translateY(-50%) translateY(0); }
+      50%       { transform: translateY(-50%) translateY(-8px); }
+    }
+
+    .sticker-frame {
+      position: relative;
+      background: var(--cream);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 0.45rem;
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.28),
+        0 0 0 5px rgba(201, 162, 39, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .sticker-frame::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(201, 162, 39, 0.35);
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .sticker-art {
+      position: relative;
+      z-index: 0;
+      line-height: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid var(--gold);
+      background: var(--cream-dark);
+    }
+
+    .sticker-art img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 128px;
+      object-fit: contain;
+      object-position: center top;
+    }
+
+    .sticker-caption {
+      display: block;
+      margin-top: 0.35rem;
+      font-family: "Great Vibes", cursive;
+      font-size: clamp(0.85rem, 2.8vw, 1rem);
+      color: var(--maroon);
+      line-height: 1;
+    }
+
+    .side-timer {
+      position: fixed;
+      z-index: 15;
+      right: max(0.5rem, env(safe-area-inset-right, 0px));
+      top: 50%;
+      transform: translateY(-50%);
+      width: clamp(96px, 14vw, 118px);
+      background: var(--cream);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 0.65rem 0.5rem 0.55rem;
+      text-align: center;
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.28),
+        0 0 0 5px rgba(201, 162, 39, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .side-timer::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      border-radius: 11px;
+      pointer-events: none;
+    }
+
+    .timer-header {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .timer-header .timer-title {
+      margin: 0;
+    }
+
+    .timer-om {
+      display: block;
+      font-size: 1rem;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .timer-title {
+      font-family: "Playfair Display", serif;
+      font-size: 0.48rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--maroon);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .timer-divider {
+      width: 70%;
+      height: 1px;
+      margin: 0 auto 0.45rem;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .timer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      position: relative;
+    }
+
+    .timer-unit {
+      background: linear-gradient(160deg, var(--maroon-deep) 0%, var(--maroon) 100%);
+      border-radius: 10px;
+      padding: 0.38rem 0.15rem;
+      border: 1px solid rgba(201, 162, 39, 0.45);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .timer-num {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(0.95rem, 2.8vw, 1.15rem);
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1.1;
+      display: block;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-lbl {
+      font-size: 0.4rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 0.15rem;
+      display: block;
+    }
+
+    .timer-days {
+      grid-column: 1 / -1;
+      background: linear-gradient(160deg, var(--maroon) 0%, #5c0f28 100%);
+      border-color: var(--gold);
+    }
+
+    .timer-days .timer-num {
+      font-size: clamp(1.2rem, 3.5vw, 1.45rem);
+      color: var(--cream);
+    }
+
+    /* Mobile: timer top · sticker bottom */
+    @media (max-width: 639px) {
+      .stack-wrap {
+        height: min(50dvh, 380px);
+      }
+
+      .side-timer {
+        top: calc(0.4rem + var(--safe-t));
+        left: 50%;
+        right: auto;
+        bottom: auto;
+        transform: translateX(-50%);
+        width: min(calc(100% - 1rem), 360px);
+        padding: 0.5rem 0.75rem 0.55rem;
+        border-radius: 14px;
+      }
+
+      .timer-header {
+        flex-direction: row;
+        justify-content: center;
+        gap: 0.35rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .timer-om {
+        display: block;
+        font-size: 0.9rem;
+        margin: 0;
+      }
+
+      .timer-title {
+        font-size: 0.5rem;
+        letter-spacing: 0.16em;
+      }
+
+      .timer-divider { display: none; }
+
+      .timer-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.4rem;
+      }
+
+      .timer-days { grid-column: auto; }
+
+      .timer-days .timer-num {
+        font-size: clamp(1rem, 4.5vw, 1.15rem);
+      }
+
+      .timer-num {
+        font-size: clamp(0.9rem, 4vw, 1.05rem);
+      }
+
+      .timer-lbl { font-size: 0.38rem; }
+
+      .timer-unit { padding: 0.4rem 0.12rem; border-radius: 8px; }
+
+      .side-sticker {
+        left: 50%;
+        right: auto;
+        top: auto;
+        bottom: calc(0.35rem + var(--safe-b));
+        transform: translateX(-50%);
+        width: clamp(108px, 26vw, 128px);
+        animation: stickerFloatMobile 4s ease-in-out infinite;
+      }
+
+      @keyframes stickerFloatMobile {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50%       { transform: translateX(-50%) translateY(-6px); }
+      }
+
+      .timeline { margin-top: 0.55rem; margin-bottom: 0; }
+      .bar { margin-top: 0.5rem; }
+      .tap-card {
+        margin-top: 0.3rem;
+        margin-bottom: calc(5.5rem + var(--safe-b));
+        font-size: 0.52rem;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .side-sticker { width: 100px; }
+      .sticker-art img { max-height: 108px; }
+      .stack-wrap { height: min(46dvh, 340px); }
+    }
+
+    @media (max-height: 620px) and (max-width: 639px) {
+      .stack-wrap { height: min(44dvh, 320px); }
+      .stage {
+        padding-top: calc(5rem + var(--safe-t));
+        padding-bottom: calc(5.75rem + var(--safe-b));
+      }
+      .side-sticker { width: 96px; }
+      .sticker-art img { max-height: 100px; }
+    }
+
+    @media (min-width: 640px) {
+      .side-sticker { left: max(0.75rem, env(safe-area-inset-left)); }
+      .side-timer { right: max(0.75rem, env(safe-area-inset-right)); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stack-card { transition: none !important; }
+      *, *::before, *::after { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene" aria-hidden="true"></div>
+
+  <!-- Anime wedding couple sticker -->
+  <div class="side-sticker" aria-hidden="true">
+    <div class="sticker-frame">
+      <div class="sticker-art">
+        <img
+          src="images/couple-together-forever.png"
+          alt="Anime couple getting married"
+        />
+      </div>
+      <span class="sticker-caption">Together Forever</span>
+    </div>
+  </div>
+
+  <!-- Countdown timer -->
+  <aside class="side-timer" aria-label="Countdown to wedding">
+    <div class="timer-header">
+      <span class="timer-om">ॐ</span>
+      <p class="timer-title">Until Muhurtham</p>
+    </div>
+    <div class="timer-divider"></div>
+    <div class="timer-grid">
+      <div class="timer-unit timer-days">
+        <span class="timer-num" id="cdDays">--</span>
+        <span class="timer-lbl">Days</span>
+      </div>
+      <div class="timer-unit">
+        <span class="timer-num" id="cdHours">--</span>
+        <span class="timer-lbl">Hrs</span>
+      </div>
+      <div class="timer-unit">
+        <span class="timer-num" id="cdMins">--</span>
+        <span class="timer-lbl">Min</span>
+      </div>
+      <div class="timer-unit">
+        <span class="timer-num" id="cdSecs">--</span>
+        <span class="timer-lbl">Sec</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="petals" aria-hidden="true">
+    <span class="petal j" style="left:8%;animation-duration:12s;"></span>
+    <span class="petal r" style="left:25%;animation-duration:9s;animation-delay:1s;"></span>
+    <span class="petal j" style="left:48%;animation-duration:14s;animation-delay:2s;"></span>
+    <span class="petal r" style="left:70%;animation-duration:10s;animation-delay:0.5s;"></span>
+    <span class="petal j" style="left:88%;animation-duration:11s;animation-delay:3s;"></span>
+  </div>
+
+  <div class="stage">
+    <div class="stack-wrap" id="stack">
+
+      <article class="stack-card" data-id="0" data-label="Welcome">
+        <span class="card-label">01</span>
+        <img class="hero-art" src="images/couple-together-forever.png" alt="Subash and Jamuna — Together Forever" />
+        <div class="card-om">ॐ</div>
+        <h2 class="card-title">You're Invited</h2>
+        <div class="gold-line"></div>
+        <p class="card-sub">Wedding Celebration</p>
+        <p class="card-body" style="margin-top:0.5rem">
+          Join us in celebrating the sacred bond of marriage with love, joy and blessings.
+        </p>
+      </article>
+
+      <article class="stack-card" data-id="1" data-label="Couple">
+        <span class="card-label">02</span>
+        <img class="featured-art" src="images/couple-seated.png" alt="Subash and Jamuna" />
+        <p class="name-script">Vasantha kumar S</p>
+        <p class="name-alias">(a) Subash S</p>
+        <p class="duo-amp" style="margin:0.15rem 0">&amp;</p>
+        <p class="name-script">Jeevitha S</p>
+        <p class="name-alias">(a) Jamuna S</p>
+        <div class="gold-line"></div>
+        <p class="card-body">Cordially invite you and your family to grace the occasion of their marriage</p>
+      </article>
+
+      <article class="stack-card gallery-card" data-id="2" data-label="Moments">
+        <span class="card-label">03</span>
+        <p class="card-sub">Moments</p>
+        <div class="couple-gallery">
+          <figure><img src="images/couple-together-forever.png" alt="Together Forever" /></figure>
+          <figure><img src="images/couple-evening.png" alt="Celebrating together" /></figure>
+          <figure><img src="images/couple-seated.png" alt="Subash and Jamuna seated" /></figure>
+          <figure><img src="images/couple-church.png" alt="Subash and Jamuna outdoors" /></figure>
+        </div>
+      </article>
+
+      <article class="stack-card" data-id="3" data-label="Reception">
+        <span class="card-label">04</span>
+        <h2 class="card-title">Reception</h2>
+        <div class="gold-line"></div>
+        <p class="card-body">
+          12.09.2026 Saturday<br />
+          at <strong style="display:inline;font-style:italic">6.00 p.m. Onwards</strong>
+        </p>
+        <p class="name-script" style="margin-top:0.85rem;color:var(--gold)">With Best Compliments</p>
+      </article>
+
+      <article class="stack-card" data-id="4" data-label="Muhurtham">
+        <span class="card-label">05</span>
+        <p class="card-sub">Muhurtham</p>
+        <h2 class="card-title" style="font-size:clamp(1.4rem,5.5vw,2rem)">13<sup>th</sup> Sep 2026</h2>
+        <div class="gold-line"></div>
+        <p class="card-body">
+          On Sunday, the 13<sup>th</sup> Sep. 2026,<br />
+          between <strong style="display:inline;font-style:italic">6.00 a.m. to 7.30 a.m.</strong>
+        </p>
+      </article>
+
+      <article class="stack-card" data-id="5" data-label="Venue">
+        <span class="card-label">06</span>
+        <p class="card-sub">Venue</p>
+        <div class="gold-line"></div>
+        <p class="card-body">
+          <strong>ThiruMuruga Thirumana Arangam</strong>
+          No.1/4, Leelavathi Nagar, Cikkarayapuram,<br />
+          Chennai – 600 069.
+        </p>
+        <a class="map-btn" href="https://maps.google.com/?q=ThiruMuruga+Thirumana+Arangam+Chennai" target="_blank" rel="noopener">View on Map</a>
+      </article>
+
+    </div>
+
+    <nav class="timeline" id="timeline" aria-label="Invitation sections">
+      <div class="timeline-fill" id="timelineFill"></div>
+      <button class="t-node active" data-go="0"><span class="t-dot">1</span><span class="t-label">Welcome</span></button>
+      <button class="t-node" data-go="1"><span class="t-dot">2</span><span class="t-label">Couple</span></button>
+      <button class="t-node" data-go="2"><span class="t-dot">3</span><span class="t-label">Moments</span></button>
+      <button class="t-node" data-go="3"><span class="t-dot">4</span><span class="t-label">Reception</span></button>
+      <button class="t-node" data-go="4"><span class="t-dot">5</span><span class="t-label">Muhurtham</span></button>
+      <button class="t-node" data-go="5"><span class="t-dot">6</span><span class="t-label">Venue</span></button>
+    </nav>
+
+    <div class="bar">
+      <button class="bar-btn" id="pauseBtn" aria-label="Pause">❚❚</button>
+      <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+      <button class="bar-btn" id="nextBtn" aria-label="Next card">›</button>
+    </div>
+
+    <p class="tap-card">Tap card to skip ahead</p>
+  </div>
+
+  <script>
+    const AUTO_MS = 2000;
+    const stack = document.getElementById("stack");
+    const cards = [...stack.querySelectorAll(".stack-card")];
+    const nodes = [...document.querySelectorAll(".t-node")];
+    const barFill = document.getElementById("barFill");
+    const timelineFill = document.getElementById("timelineFill");
+    const pauseBtn = document.getElementById("pauseBtn");
+
+    const CARD_COUNT = cards.length;
+    const order = cards.map(c => +c.dataset.id);
+    let topIndex = 0;
+    let paused = false;
+    let animating = false;
+    let tickStart = Date.now();
+
+    function relPos(cardId) {
+      const idx = order.indexOf(cardId);
+      const top = order.indexOf(topIndex);
+      const diff = (idx - top + CARD_COUNT) % CARD_COUNT;
+      if (diff === 0) return 0;
+      if (diff <= 4) return diff;
+      return "hidden";
+    }
+
+    function layout() {
+      cards.forEach(card => {
+        const id = +card.dataset.id;
+        card.dataset.pos = relPos(id);
+        card.classList.remove("exit-left", "enter-back");
+      });
+      const step = order.indexOf(topIndex);
+      nodes.forEach(n => {
+        const go = +n.dataset.go;
+        n.classList.toggle("active", go === topIndex);
+        n.classList.toggle("done", order.indexOf(go) < step);
+      });
+      timelineFill.style.width = (step / (CARD_COUNT - 1)) * 90 + "%";
+    }
+
+    function advance() {
+      if (animating) return;
+      animating = true;
+
+      const topCard = cards.find(c => +c.dataset.id === topIndex);
+      topCard.classList.add("exit-left");
+
+      setTimeout(() => {
+        topCard.classList.remove("exit-left");
+        topIndex = order[(order.indexOf(topIndex) + 1) % CARD_COUNT];
+        layout();
+        const lastInStack = cards.find(c => c.dataset.pos === "4");
+        if (lastInStack) {
+          lastInStack.classList.add("enter-back");
+          setTimeout(() => lastInStack.classList.remove("enter-back"), 600);
+        }
+        tickStart = Date.now();
+        barFill.style.width = "0%";
+        animating = false;
+      }, 650);
+    }
+
+    function goTo(id) {
+      if (animating || id === topIndex) return;
+      topIndex = id;
+      layout();
+      tickStart = Date.now();
+      barFill.style.width = "0%";
+    }
+
+    function tick() {
+      if (!paused && !animating) {
+        const e = Date.now() - tickStart;
+        barFill.style.width = Math.min(e / AUTO_MS * 100, 100) + "%";
+        if (e >= AUTO_MS) advance();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    layout();
+    tick();
+
+    pauseBtn.addEventListener("click", () => {
+      paused = !paused;
+      pauseBtn.textContent = paused ? "▶" : "❚❚";
+      if (!paused) tickStart = Date.now() - (parseFloat(barFill.style.width) / 100) * AUTO_MS;
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", advance);
+    nodes.forEach(n => n.addEventListener("click", () => goTo(+n.dataset.go)));
+    stack.addEventListener("click", (e) => {
+      if (e.target.closest(".map-btn")) return;
+      if (!animating) advance();
+    });
+
+    document.addEventListener("visibilitychange", () => { if (document.hidden) paused = true; });
+
+    /* Countdown to muhurtham: 13 Sep 2026, 6:00 AM IST */
+    const WEDDING = new Date("2026-09-13T06:00:00+05:30");
+
+    function pad(n) { return String(n).padStart(2, "0"); }
+
+    function updateCountdown() {
+      const diff = WEDDING - Date.now();
+      if (diff <= 0) {
+        document.getElementById("cdDays").textContent = "0";
+        document.getElementById("cdHours").textContent = "00";
+        document.getElementById("cdMins").textContent = "00";
+        document.getElementById("cdSecs").textContent = "00";
+        return;
+      }
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      document.getElementById("cdDays").textContent = days;
+      document.getElementById("cdHours").textContent = pad(hours);
+      document.getElementById("cdMins").textContent = pad(mins);
+      document.getElementById("cdSecs").textContent = pad(secs);
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
