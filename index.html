@@ -35,6 +35,7 @@
       document.head.appendChild(b);
     })();
   </script>
+  <link rel="preload" href="audio/mangalyam.mp3" as="fetch" type="audio/mpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet" />
@@ -1002,6 +1003,60 @@
       text-transform: uppercase;
       color: rgba(240, 215, 140, 0.7);
     }
+
+    .invite-gate-hint.is-loading {
+      opacity: 0.55;
+    }
+
+    .in-app-hint {
+      margin-top: 0.85rem;
+      font-size: 0.58rem;
+      line-height: 1.5;
+      letter-spacing: 0.04em;
+      color: rgba(255, 210, 130, 0.85);
+      max-width: 18rem;
+    }
+
+    .in-app-hint.is-hidden {
+      display: none;
+    }
+
+    .music-fallback {
+      position: fixed;
+      left: 50%;
+      bottom: calc(5.5rem + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 180;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      background: rgba(74, 10, 28, 0.92);
+      color: var(--gold-light);
+      font-family: inherit;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      animation: musicPulse 2s ease-in-out infinite;
+    }
+
+    .music-fallback.is-hidden {
+      display: none;
+    }
+
+    @keyframes musicPulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); }
+      50%       { box-shadow: 0 8px 28px rgba(201, 162, 39, 0.45); }
+    }
+
+    #bgMusic {
+      position: fixed;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -1016,9 +1071,12 @@
       <span class="invite-gate-om">ॐ</span>
       <h1 class="invite-gate-title">Vasanth &amp; Jeevitha</h1>
       <p class="invite-gate-sub">Wedding Invitation</p>
-      <p class="invite-gate-hint">Tap to open &amp; play music</p>
+      <p class="invite-gate-hint" id="gateHint">Loading music…</p>
+      <p class="in-app-hint is-hidden" id="inAppHint">If music does not play, tap ⋯ and choose <strong>Open in browser</strong> (Safari / Chrome).</p>
     </div>
   </div>
+
+  <button type="button" class="music-fallback is-hidden" id="musicFallback" aria-label="Play wedding music">♪ Tap for music</button>
 
   <div class="scene" aria-hidden="true"></div>
 
@@ -1164,7 +1222,8 @@
     <p class="tap-card">Tap card to skip ahead</p>
   </div>
 
-  <audio id="bgMusic" src="audio/mangalyam.mp3" loop preload="auto" playsinline webkit-playsinline></audio>
+  <!-- Hidden video works more reliably than audio on iOS / in-app browsers -->
+  <video id="bgMusic" playsinline webkit-playsinline loop preload="auto" tabindex="-1" aria-hidden="true"></video>
 
   <script>
     const AUTO_MS = 2000;
@@ -1185,8 +1244,71 @@
 
     const bgMusic = document.getElementById("bgMusic");
     const inviteGate = document.getElementById("inviteGate");
+    const gateHint = document.getElementById("gateHint");
+    const musicFallback = document.getElementById("musicFallback");
+    const inAppHint = document.getElementById("inAppHint");
+
+    const MUSIC_SRC = (() => {
+      const parts = location.pathname.split("/").filter(Boolean);
+      const root = parts[0] === "VJwedding"
+        ? `${location.origin}/VJwedding/`
+        : location.href.replace(/[^/]*$/, "");
+      return new URL("audio/mangalyam.mp3", root).href;
+    })();
+
+    const isInAppBrowser = /FBAN|FBAV|Instagram|Line\/|WhatsApp|Messenger|Twitter|LinkedInApp/i.test(navigator.userAgent);
+    let musicWanted = false;
+    let audioReady = false;
+
+    bgMusic.src = MUSIC_SRC;
     bgMusic.volume = 0.6;
     bgMusic.loop = true;
+    bgMusic.muted = false;
+    bgMusic.setAttribute("playsinline", "");
+    bgMusic.setAttribute("webkit-playsinline", "");
+
+    if (isInAppBrowser) inAppHint.classList.remove("is-hidden");
+
+    function markAudioReady() {
+      if (audioReady) return;
+      audioReady = true;
+      gateHint.textContent = "Tap to open & play music";
+      gateHint.classList.remove("is-loading");
+    }
+
+    function showMusicFallback() {
+      if (inviteOpen && musicWanted && bgMusic.paused) {
+        musicFallback.classList.remove("is-hidden");
+      }
+    }
+
+    function hideMusicFallback() {
+      musicFallback.classList.add("is-hidden");
+    }
+
+    function resumeAudioContext() {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!window.__inviteAudioCtx) window.__inviteAudioCtx = new Ctx();
+      if (window.__inviteAudioCtx.state === "suspended") {
+        window.__inviteAudioCtx.resume();
+      }
+    }
+
+    function tryPlayMusic() {
+      if (!musicWanted) return;
+      bgMusic.muted = false;
+      bgMusic.volume = 0.6;
+      resumeAudioContext();
+      const attempt = bgMusic.play();
+      if (attempt && typeof attempt.then === "function") {
+        attempt
+          .then(() => hideMusicFallback())
+          .catch(() => showMusicFallback());
+      } else if (!bgMusic.paused) {
+        hideMusicFallback();
+      }
+    }
 
     function beginInvite() {
       if (inviteOpen) return;
@@ -1197,35 +1319,60 @@
       barFill.style.width = "0%";
     }
 
-    function startMusicFromGesture() {
-      bgMusic.muted = false;
-      bgMusic.volume = 0.6;
-      bgMusic.loop = true;
-      if (bgMusic.paused) {
-        const playAttempt = bgMusic.play();
-        if (playAttempt && typeof playAttempt.catch === "function") {
-          playAttempt.catch(() => {});
-        }
-      }
-    }
-
     function openInvite(e) {
       if (inviteOpen) return;
       if (e) {
         e.preventDefault();
         e.stopPropagation();
       }
-      startMusicFromGesture();
+      musicWanted = true;
+      if (!audioReady) bgMusic.load();
+      tryPlayMusic();
       beginInvite();
+      if (bgMusic.paused) {
+        bgMusic.addEventListener("canplay", tryPlayMusic, { once: true });
+      }
     }
 
-    inviteGate.addEventListener("touchstart", openInvite, { passive: false });
-    inviteGate.addEventListener("click", openInvite);
+    function unlockMusicFromGesture() {
+      musicWanted = true;
+      tryPlayMusic();
+    }
+
+    inviteGate.addEventListener("pointerup", openInvite, { capture: true });
+    inviteGate.addEventListener("click", openInvite, { capture: true });
     inviteGate.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") openInvite(e);
     });
 
+    musicFallback.addEventListener("pointerup", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      unlockMusicFromGesture();
+    });
+
+    [stack, document.getElementById("nextBtn"), pauseBtn].forEach((el) => {
+      el.addEventListener("pointerup", () => {
+        if (inviteOpen && bgMusic.paused) unlockMusicFromGesture();
+      }, { passive: true });
+    });
+
+    ["canplay", "canplaythrough", "loadeddata"].forEach((evt) => {
+      bgMusic.addEventListener(evt, () => {
+        markAudioReady();
+        tryPlayMusic();
+      });
+    });
+
+    bgMusic.addEventListener("playing", hideMusicFallback);
+    bgMusic.addEventListener("error", () => {
+      gateHint.textContent = "Tap to open invitation";
+      showMusicFallback();
+    });
+
+    gateHint.classList.add("is-loading");
     bgMusic.load();
+    setTimeout(markAudioReady, 2500);
 
     function relPos(cardId) {
       const idx = order.indexOf(cardId);
