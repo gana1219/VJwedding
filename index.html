@@ -6,25 +6,25 @@
   <meta name="theme-color" content="#4a0a1c" />
   <meta name="description" content="You're invited! Muhurtham: 13 Sep 2026, Reception: 12 Sep 2026" />
 
-  <meta property="og:title" content="Subash &amp; Jamuna - Wedding Invitation" />
+  <meta property="og:title" content="Vasanth &amp; Jeevitha - Wedding Invitation" />
   <meta property="og:description" content="You're invited! Muhurtham: 13 Sep 2026, Reception: 12 Sep 2026" />
   <meta property="og:image" content="https://gana1219.github.io/VJwedding/images/og-preview.jpg" />
   <meta property="og:image:secure_url" content="https://gana1219.github.io/VJwedding/images/og-preview.jpg" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Subash and Jamuna - Wedding Invitation" />
+  <meta property="og:image:alt" content="Vasanth and Jeevitha - Wedding Invitation" />
   <meta property="og:url" content="https://gana1219.github.io/VJwedding/" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Subash &amp; Jamuna Wedding" />
+  <meta property="og:site_name" content="Vasanth &amp; Jeevitha Wedding" />
 
   <!-- WhatsApp / Twitter preview -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Subash &amp; Jamuna - Wedding Invitation" />
+  <meta name="twitter:title" content="Vasanth &amp; Jeevitha - Wedding Invitation" />
   <meta name="twitter:description" content="You're invited! Muhurtham: 13 Sep 2026" />
   <meta name="twitter:image" content="https://gana1219.github.io/VJwedding/images/og-preview.jpg" />
 
-  <title>Subash & Jamuna — Wedding Invitation</title>
+  <title>Vasanth & Jeevitha — Wedding Invitation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet" />
@@ -345,17 +345,55 @@
     .map-btn:active { background: var(--maroon); color: var(--gold-light); }
 
     /* Couple illustrations */
-    .hero-art {
-      width: min(100%, 240px);
-      height: auto;
-      max-height: 165px;
-      object-fit: contain;
-      object-position: center top;
+    .hero-art-frame {
+      align-self: stretch;
+      width: 100%;
+      margin: 0 0 0.45rem;
+      padding: 0;
       border-radius: 8px;
       border: 2px solid var(--gold);
-      margin-bottom: 0.55rem;
-      display: block;
+      overflow: hidden;
+      line-height: 0;
       box-shadow: 0 6px 18px rgba(74, 10, 28, 0.15);
+      flex-shrink: 1;
+      min-height: 0;
+    }
+
+    .hero-art {
+      width: 100%;
+      height: auto;
+      display: block;
+      vertical-align: middle;
+    }
+
+    .stack-card[data-id="0"] {
+      justify-content: flex-start;
+      gap: 0.25rem;
+      padding-top: 0.9rem;
+    }
+
+    .stack-card[data-id="0"] .card-om {
+      font-size: clamp(1.15rem, 4.5vw, 1.65rem);
+      margin-bottom: 0;
+    }
+
+    .stack-card[data-id="0"] .card-title {
+      font-size: clamp(1.55rem, 6vw, 2.25rem);
+      line-height: 1.1;
+    }
+
+    .stack-card[data-id="0"] .gold-line {
+      margin: 0.4rem auto;
+    }
+
+    .stack-card[data-id="0"] .card-sub {
+      margin-top: 0;
+    }
+
+    .stack-card[data-id="0"] .card-body {
+      font-size: clamp(0.76rem, 2.8vw, 0.92rem);
+      line-height: 1.45;
+      margin-top: 0.25rem !important;
     }
 
     .featured-art {
@@ -837,7 +875,7 @@
       <div class="sticker-art">
         <img
           src="images/couple-together-forever.png"
-          alt="Anime couple getting married"
+          alt="Vasanth Kumar and Jeevitha together forever"
         />
       </div>
       <span class="sticker-caption">Together Forever</span>
@@ -884,7 +922,9 @@
 
       <article class="stack-card" data-id="0" data-label="Welcome">
         <span class="card-label">01</span>
-        <img class="hero-art" src="images/couple-together-forever.png" alt="Subash and Jamuna — Together Forever" />
+        <figure class="hero-art-frame">
+          <img class="hero-art" src="images/couple-together-forever.png" alt="Vasanth and Jeevitha — Together Forever" />
+        </figure>
         <div class="card-om">ॐ</div>
         <h2 class="card-title">You're Invited</h2>
         <div class="gold-line"></div>
@@ -896,12 +936,11 @@
 
       <article class="stack-card" data-id="1" data-label="Couple">
         <span class="card-label">02</span>
-        <img class="featured-art" src="images/couple-seated.png" alt="Subash and Jamuna" />
+        <img class="featured-art" src="images/couple-seated.png" alt="Vasanth and Jeevitha" />
         <p class="name-script">Vasantha kumar S</p>
-        <p class="name-alias">(a) Subash S</p>
+        <div class="gold-line"></div>
         <p class="duo-amp" style="margin:0.15rem 0">&amp;</p>
         <p class="name-script">Jeevitha S</p>
-        <p class="name-alias">(a) Jamuna S</p>
         <div class="gold-line"></div>
         <p class="card-body">Cordially invite you and your family to grace the occasion of their marriage</p>
       </article>
@@ -912,8 +951,8 @@
         <div class="couple-gallery">
           <figure><img src="images/couple-together-forever.png" alt="Together Forever" /></figure>
           <figure><img src="images/couple-evening.png" alt="Celebrating together" /></figure>
-          <figure><img src="images/couple-seated.png" alt="Subash and Jamuna seated" /></figure>
-          <figure><img src="images/couple-church.png" alt="Subash and Jamuna outdoors" /></figure>
+          <figure><img src="images/couple-seated.png" alt="Vasanth and Jeevitha seated" /></figure>
+          <figure><img src="images/couple-church.png" alt="Vasanth and Jeevitha outdoors" /></figure>
         </div>
       </article>
 
