@@ -937,6 +937,8 @@
       justify-content: center;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
       background:
         radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.14) 0%, transparent 55%),
         linear-gradient(175deg, var(--maroon-deep) 0%, var(--maroon) 45%, #5c0f28 100%);
@@ -988,7 +990,7 @@
 </head>
 <body>
 
-  <div id="inviteGate" class="invite-gate is-hidden" aria-label="Open wedding invitation">
+  <div id="inviteGate" class="invite-gate is-hidden" role="button" tabindex="0" aria-label="Open wedding invitation">
     <div class="invite-gate-inner">
       <span class="invite-gate-om">ॐ</span>
       <h1 class="invite-gate-title">Vasanth &amp; Jeevitha</h1>
@@ -1163,8 +1165,10 @@
     const bgMusic = document.getElementById("bgMusic");
     const inviteGate = document.getElementById("inviteGate");
     bgMusic.volume = 0.6;
+    let autoplayTried = false;
 
     function beginInvite() {
+      if (inviteOpen) return;
       inviteOpen = true;
       inviteGate.classList.add("is-hidden");
       paused = false;
@@ -1173,48 +1177,43 @@
     }
 
     function showGate() {
-      inviteOpen = false;
+      if (inviteOpen) return;
       inviteGate.classList.remove("is-hidden");
       paused = true;
       barFill.style.width = "0%";
     }
 
-    async function startMusic() {
+    async function tryAutoplay() {
+      if (inviteOpen || autoplayTried) return;
+      autoplayTried = true;
       try {
         bgMusic.muted = true;
         await bgMusic.play();
         bgMusic.muted = false;
         beginInvite();
-        return true;
       } catch {
-        try {
-          bgMusic.muted = false;
-          await bgMusic.play();
-          beginInvite();
-          return true;
-        } catch {
-          showGate();
-          return false;
-        }
+        showGate();
       }
     }
 
-    function openInvite() {
+    function openInvite(e) {
       if (inviteOpen) return;
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       beginInvite();
       bgMusic.muted = false;
       bgMusic.volume = 0.6;
       bgMusic.play().catch(() => {});
     }
 
-    inviteGate.addEventListener("pointerup", openInvite, { once: true });
+    inviteGate.addEventListener("pointerdown", openInvite, { passive: false });
 
     bgMusic.addEventListener("playing", () => { bgMusic.muted = false; });
-    bgMusic.addEventListener("canplaythrough", startMusic, { once: true });
-    bgMusic.addEventListener("loadeddata", startMusic, { once: true });
-    window.addEventListener("load", startMusic);
-    window.addEventListener("pageshow", startMusic);
-    startMusic();
+    bgMusic.addEventListener("canplaythrough", tryAutoplay, { once: true });
+    window.addEventListener("load", tryAutoplay, { once: true });
+    tryAutoplay();
 
     function relPos(cardId) {
       const idx = order.indexOf(cardId);
@@ -1327,12 +1326,11 @@
       if (document.hidden) {
         paused = true;
         bgMusic.pause();
-      } else {
-        startMusic();
-        if (inviteOpen) {
-          paused = false;
-          tickStart = Date.now();
-        }
+      } else if (inviteOpen) {
+        bgMusic.muted = false;
+        bgMusic.play().catch(() => {});
+        paused = false;
+        tickStart = Date.now();
       }
     });
   </script>
