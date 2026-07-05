@@ -1065,6 +1065,8 @@
     <p class="tap-card">Tap card to skip ahead</p>
   </div>
 
+  <audio id="bgMusic" src="audio/mangalyam.mp3" loop preload="auto" playsinline></audio>
+
   <script>
     const AUTO_MS = 2000;
     const stack = document.getElementById("stack");
@@ -1188,6 +1190,40 @@
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
+
+    const bgMusic = document.getElementById("bgMusic");
+    let musicUnlocked = false;
+
+    bgMusic.volume = 0.55;
+
+    function unlockMusic() {
+      if (musicUnlocked) return;
+      bgMusic.muted = false;
+      bgMusic.volume = 0.55;
+      bgMusic.play().then(() => { musicUnlocked = true; }).catch(() => {});
+    }
+
+    function tryAutoplay() {
+      bgMusic.muted = false;
+      bgMusic.play().then(() => { musicUnlocked = true; }).catch(() => {
+        bgMusic.muted = true;
+        bgMusic.play().catch(() => {});
+      });
+    }
+
+    tryAutoplay();
+    window.addEventListener("load", tryAutoplay);
+    document.addEventListener("pointerdown", unlockMusic, { passive: true });
+    document.addEventListener("touchstart", unlockMusic, { passive: true });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        paused = true;
+        bgMusic.pause();
+      } else if (musicUnlocked) {
+        bgMusic.play().catch(() => {});
+      }
+    });
   </script>
 </body>
 </html>
