@@ -25,6 +25,18 @@
   <meta name="twitter:image" content="https://gana1219.github.io/VJwedding/images/og-preview.jpg" />
 
   <title>Vasanth & Jeevitha — Wedding Invitation</title>
+  <audio id="bgMusic" src="audio/mangalyam.mp3" loop autoplay muted preload="auto" playsinline></audio>
+  <script>
+    (function () {
+      var a = document.getElementById("bgMusic");
+      a.volume = 0.55;
+      function go() {
+        a.play().then(function () { a.muted = false; }).catch(function () {});
+      }
+      go();
+      a.addEventListener("canplaythrough", go, { once: true });
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet" />
@@ -1065,8 +1077,6 @@
     <p class="tap-card">Tap card to skip ahead</p>
   </div>
 
-  <audio id="bgMusic" src="audio/mangalyam.mp3" loop preload="auto" playsinline></audio>
-
   <script>
     const AUTO_MS = 2000;
     const stack = document.getElementById("stack");
@@ -1082,6 +1092,23 @@
     let paused = false;
     let animating = false;
     let tickStart = Date.now();
+    let musicBooted = false;
+
+    const bgMusic = document.getElementById("bgMusic");
+    bgMusic.volume = 0.55;
+
+    function startMusic() {
+      bgMusic.play().then(() => { bgMusic.muted = false; }).catch(() => {
+        bgMusic.muted = true;
+        bgMusic.play().then(() => { bgMusic.muted = false; }).catch(() => {});
+      });
+    }
+
+    startMusic();
+    bgMusic.addEventListener("playing", () => { bgMusic.muted = false; });
+    bgMusic.addEventListener("canplaythrough", startMusic, { once: true });
+    window.addEventListener("load", startMusic);
+    window.addEventListener("pageshow", startMusic);
 
     function relPos(cardId) {
       const idx = order.indexOf(cardId);
@@ -1138,6 +1165,10 @@
     }
 
     function tick() {
+      if (!musicBooted) {
+        musicBooted = true;
+        startMusic();
+      }
       if (!paused && !animating) {
         const e = Date.now() - tickStart;
         barFill.style.width = Math.min(e / AUTO_MS * 100, 100) + "%";
@@ -1161,8 +1192,6 @@
       if (e.target.closest(".map-btn")) return;
       if (!animating) advance();
     });
-
-    document.addEventListener("visibilitychange", () => { if (document.hidden) paused = true; });
 
     /* Countdown to muhurtham: 13 Sep 2026, 6:00 AM IST */
     const WEDDING = new Date("2026-09-13T06:00:00+05:30");
@@ -1191,37 +1220,12 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    const bgMusic = document.getElementById("bgMusic");
-    let musicUnlocked = false;
-
-    bgMusic.volume = 0.55;
-
-    function unlockMusic() {
-      if (musicUnlocked) return;
-      bgMusic.muted = false;
-      bgMusic.volume = 0.55;
-      bgMusic.play().then(() => { musicUnlocked = true; }).catch(() => {});
-    }
-
-    function tryAutoplay() {
-      bgMusic.muted = false;
-      bgMusic.play().then(() => { musicUnlocked = true; }).catch(() => {
-        bgMusic.muted = true;
-        bgMusic.play().catch(() => {});
-      });
-    }
-
-    tryAutoplay();
-    window.addEventListener("load", tryAutoplay);
-    document.addEventListener("pointerdown", unlockMusic, { passive: true });
-    document.addEventListener("touchstart", unlockMusic, { passive: true });
-
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         paused = true;
         bgMusic.pause();
-      } else if (musicUnlocked) {
-        bgMusic.play().catch(() => {});
+      } else {
+        startMusic();
       }
     });
   </script>
