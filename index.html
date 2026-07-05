@@ -935,6 +935,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
       background:
         radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.14) 0%, transparent 55%),
         linear-gradient(175deg, var(--maroon-deep) 0%, var(--maroon) 45%, #5c0f28 100%);
@@ -1198,16 +1200,14 @@
     }
 
     function openInvite() {
+      if (inviteOpen) return;
+      beginInvite();
       bgMusic.muted = false;
       bgMusic.volume = 0.6;
-      bgMusic.play().then(beginInvite).catch(showGate);
+      bgMusic.play().catch(() => {});
     }
 
-    inviteGate.addEventListener("click", openInvite);
-    inviteGate.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      openInvite();
-    }, { passive: false });
+    inviteGate.addEventListener("pointerup", openInvite, { once: true });
 
     bgMusic.addEventListener("playing", () => { bgMusic.muted = false; });
     bgMusic.addEventListener("canplaythrough", startMusic, { once: true });
