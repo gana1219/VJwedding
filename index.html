@@ -25,6 +25,16 @@
   <meta name="twitter:image" content="https://gana1219.github.io/VJwedding/images/og-preview.jpg" />
 
   <title>Vasanth & Jeevitha — Wedding Invitation</title>
+  <script>
+    (function () {
+      var b = document.createElement("base");
+      var parts = location.pathname.split("/").filter(Boolean);
+      b.href = parts[0] === "VJwedding"
+        ? location.origin + "/VJwedding/"
+        : location.href.replace(/[^/]*$/, "");
+      document.head.appendChild(b);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet" />
@@ -1065,7 +1075,7 @@
     <p class="tap-card">Tap card to skip ahead</p>
   </div>
 
-  <audio id="bgMusic" src="audio/mangalyam.mp3" type="audio/mpeg" loop preload="auto"></audio>
+  <audio id="bgMusic" type="audio/mpeg" loop preload="auto" playsinline></audio>
 
   <script>
     const AUTO_MS = 2000;
@@ -1084,6 +1094,7 @@
     let tickStart = Date.now();
 
     const bgMusic = document.getElementById("bgMusic");
+    bgMusic.src = "audio/mangalyam.mp3";
     bgMusic.volume = 0.6;
     let musicPlaying = false;
 
@@ -1101,8 +1112,10 @@
 
     bgMusic.addEventListener("canplaythrough", startMusic, { once: true });
     bgMusic.addEventListener("loadeddata", startMusic, { once: true });
+    bgMusic.load();
     if (bgMusic.readyState >= 2) startMusic();
     window.addEventListener("load", startMusic);
+    window.addEventListener("pageshow", startMusic);
 
     function relPos(cardId) {
       const idx = order.indexOf(cardId);
