@@ -1153,7 +1153,8 @@
     const CARD_COUNT = cards.length;
     const order = cards.map(c => +c.dataset.id);
     let topIndex = 0;
-    let paused = false;
+    let paused = true;
+    let inviteOpen = false;
     let animating = false;
     let tickStart = Date.now();
 
@@ -1161,12 +1162,19 @@
     const inviteGate = document.getElementById("inviteGate");
     bgMusic.volume = 0.6;
 
-    function hideGate() {
+    function beginInvite() {
+      inviteOpen = true;
       inviteGate.classList.add("is-hidden");
+      paused = false;
+      tickStart = Date.now();
+      barFill.style.width = "0%";
     }
 
     function showGate() {
+      inviteOpen = false;
       inviteGate.classList.remove("is-hidden");
+      paused = true;
+      barFill.style.width = "0%";
     }
 
     async function startMusic() {
@@ -1174,13 +1182,13 @@
         bgMusic.muted = true;
         await bgMusic.play();
         bgMusic.muted = false;
-        hideGate();
+        beginInvite();
         return true;
       } catch {
         try {
           bgMusic.muted = false;
           await bgMusic.play();
-          hideGate();
+          beginInvite();
           return true;
         } catch {
           showGate();
@@ -1192,7 +1200,7 @@
     function openInvite() {
       bgMusic.muted = false;
       bgMusic.volume = 0.6;
-      bgMusic.play().then(hideGate).catch(showGate);
+      bgMusic.play().then(beginInvite).catch(showGate);
     }
 
     inviteGate.addEventListener("click", openInvite);
@@ -1233,7 +1241,7 @@
     }
 
     function advance() {
-      if (animating) return;
+      if (!inviteOpen || animating) return;
       animating = true;
 
       const topCard = cards.find(c => +c.dataset.id === topIndex);
@@ -1255,7 +1263,7 @@
     }
 
     function goTo(id) {
-      if (animating || id === topIndex) return;
+      if (!inviteOpen || animating || id === topIndex) return;
       topIndex = id;
       layout();
       tickStart = Date.now();
@@ -1283,6 +1291,7 @@
     document.getElementById("nextBtn").addEventListener("click", advance);
     nodes.forEach(n => n.addEventListener("click", () => goTo(+n.dataset.go)));
     stack.addEventListener("click", (e) => {
+      if (!inviteOpen) return;
       if (e.target.closest(".map-btn")) return;
       if (!animating) advance();
     });
@@ -1320,6 +1329,10 @@
         bgMusic.pause();
       } else {
         startMusic();
+        if (inviteOpen) {
+          paused = false;
+          tickStart = Date.now();
+        }
       }
     });
   </script>
